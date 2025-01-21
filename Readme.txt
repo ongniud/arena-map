@@ -1,13 +1,43 @@
 
 
 
-This repo implement a arena based hashmap which can significantly reduce the gc impact.
+This repo implements an arena-based hashmap designed to significantly reduce the impact of garbage collection (GC).
 
-Sometimes, map are required in a process context, It keeps items' attributes、features of different process stages for later joining/filter/convert.
-In this scene, the map may save lots of data but do not need high concurrency, frequent update, once the process finish it can be release.
+In some scenarios, maps are required within a process context to maintain items' attributes and features of different process stages for later joining, filtering, or conversion.
+In these cases, the map may store a large amount of data but does not require high concurrency or frequent updates.
+Once the process is complete, the map can be released.
 
-As go is a gc language, frequent memory allocate/release and huge alive memory split may cause significant impact.
-So a arena based map can suite this case .
+Since Go is a garbage-collected language, frequent memory allocations and releases, maintain huge count memory blocks and pointers, can negatively impact service performance.
+An arena-based map is well-suited for this situation, as it minimizes the overhead of memory management.
+
+
+- base type are support only, complex type will be support soon.
+- memory align is not support currently due to realism complexity.
+- this arena map won't release the free chunks utils been closed, please global use with cautious.
+- this arena map cost more memory than go standard map but throughput may lower.
+- not concurrently safe , you can wrap it with mutex if needed.
+
+
+
+
+
+
+
+This repository implements an arena-based hashmap designed to significantly reduce the impact of garbage collection (GC).
+
+Use Case
+
+In certain scenarios, a map is needed to store attributes or features of different process stages, which will later be used for operations such as joining, filtering, or converting data. In this case, the map may store a large amount of data but does not require high concurrency or frequent updates. Once the process is completed, the map can be released.
+
+Since Go is a garbage-collected language, frequent memory allocations and releases, as well as the fragmentation of large memory blocks, can negatively impact service performance. An arena-based map is well-suited for this situation, as it minimizes the overhead of memory management.
+
+Key Features
+Currently, only basic types are supported; support for complex types will be added in the future.
+Memory alignment is not supported due to implementation complexity.
+This arena-based map does not release free memory chunks until the map is explicitly closed. Please use it with caution in a global context.
+The arena map consumes more memory than Go’s standard map, but its throughput may be lower.
+The map is not safe for concurrent access. If needed, you can wrap it with a mutex for thread safety.
+
 
 
 
