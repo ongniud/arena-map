@@ -7,7 +7,7 @@ import (
 )
 
 type Arena interface {
-	New(size, alignment int) unsafe.Pointer
+	New(size, align int) unsafe.Pointer
 	Free(ptr unsafe.Pointer, size int)
 	Close()
 	Stats() string

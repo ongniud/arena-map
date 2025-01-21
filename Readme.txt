@@ -1,6 +1,20 @@
 
 
 
+This repo implement a arena based hashmap which can significantly reduce the gc impact.
+
+Sometimes, map are required in a process context, It keeps items' attributes、features of different process stages for later joining/filter/convert.
+In this scene, the map may save lots of data but do not need high concurrency, frequent update, once the process finish it can be release.
+
+As go is a gc language, frequent memory allocate/release and huge alive memory split may cause significant impact.
+So a arena based map can suite this case .
+
+
+
+很多时候，在一个请求上下文中，使用 map 存储 item 维度的信息，用于后续聚合处理；
+这个 map 没有高并发，不会频繁删除，在处理结束后可以释放；
+
+
 
 1. 类似 tslab 那样，实现一个自定义指针，格式类似 prt:=sc_id|slb_id|ck_id ，通过 ref() 获取 pointer 指针；
 这样释放、调试、增/减引用时比较方便，不需要再根据 pointer 和 size 去查（size比较麻烦），带来的问题时，使用者需要理解和保存这个指针；
@@ -54,5 +68,5 @@ func (e EObject[T]) Set(t T) {
 2. 不支持内存对齐；支持思路：
     (1) 每个 slab class 中，分配 chunk 时遍历找到地址符合要求的，这要求对 free chunk list 进行改造，支持遍历删除等；但是可能遍历完也找不到合适的；
     (2) 每个 slab class 中，分配不同 align 的子 chunk free 列表，如果找不到，在新建 slab 时使用 mmap 支持从指定 offset 分配堆内存；
-3. 
+3. 内存会被复用，但是不会回收；认为确保close 后所有内存不会被复用。
 
