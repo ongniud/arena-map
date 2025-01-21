@@ -5,6 +5,35 @@ import (
 	"unsafe"
 )
 
+func Allocate[T any](mem Arena, data T) *T {
+	switch v := any(data).(type) {
+	case string:
+		bytes := MakeSlice[byte](mem, len(v), len(v))
+		copy(bytes, v)
+		ptr := New[string](mem)
+		*ptr = string(bytes)
+		return any(ptr).(*T)
+	default:
+		allocated := New[T](mem)
+		*allocated = data
+		return allocated
+	}
+}
+
+func Release[T any](mem Arena, ptr *T) {
+	if ptr == nil {
+		return
+	}
+	switch v := any(*ptr).(type) {
+	case string:
+		bytes := []byte(v)
+		FreeSlice[byte](mem, bytes)
+		Free[T](mem, ptr)
+	default:
+		Free[T](mem, ptr)
+	}
+}
+
 // New allocates memory for a value of type T using the provided Arena.
 // If the arena is non-nil, it returns a  *T pointer with memory allocated from the arena.
 // If passed arena is nil, it allocates memory using Go's built-in new function.
@@ -75,4 +104,36 @@ func FreeSlice[T any](a Arena, slice []T) {
 		size := int(val.Type().Elem().Size()) * val.Cap()
 		a.Free(ptr, size)
 	}
+}
+
+// SliceAppend appends elements to a slice of type T using a provided Arena
+// for memory allocation if needed.
+func SliceAppend[T any](a Arena, s []T, data ...T) ([]T, bool) {
+	if a == nil {
+		return append(s, data...), false
+	}
+	if l := len(s) + len(data); l > cap(s) {
+		r := expandSlice(a, s, l)
+		return append(r, data...), true
+	}
+	return append(s, data...), false
+}
+
+const sliceGrowThreshold = 256
+
+func expandSlice[T any](a Arena, s []T, l int) []T {
+	c := cap(s)
+	if c == 0 {
+		c = 1
+	}
+	for l > c {
+		if c < sliceGrowThreshold {
+			c *= 2
+		} else {
+			c += c / 4
+		}
+	}
+	s2 := MakeSlice[T](a, len(s), c)
+	copy(s2, s)
+	return s2
 }
