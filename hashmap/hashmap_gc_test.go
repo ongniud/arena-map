@@ -2,14 +2,15 @@ package hashmap
 
 import (
 	"fmt"
-	"github.com/ongniud/arena-map/arena"
 	"runtime"
 	"testing"
 	"time"
+
+	"github.com/ongniud/arena-map/arena"
 )
 
 const (
-	numEntries = 300000 // 数据量
+	numEntries = 300000
 )
 
 func TestArenaHashMap_PutPerformance(t *testing.T) {
@@ -39,7 +40,7 @@ func TestArenaHashMap_PutPerformance(t *testing.T) {
 func TestArenaHashMapPtr_PutPerformance(t *testing.T) {
 	mem := arena.NewArena()
 	defer mem.Close()
-	hm := NewArenaHashMapPtr[int, string](mem)
+	hm := NewArenaHashMap[int, string](mem)
 
 	startPut := time.Now()
 	for i := 0; i < numEntries; i++ {
@@ -47,15 +48,15 @@ func TestArenaHashMapPtr_PutPerformance(t *testing.T) {
 		hm.Put(i, str)
 	}
 	putDuration := time.Since(startPut)
-	fmt.Printf("ArenaHashMapPtr Put Time: %v\n", putDuration)
-	printMemStats("ArenaHashMapPtr Put Mem Stats")
+	fmt.Printf("ArenaHashMap Put Time: %v\n", putDuration)
+	printMemStats("ArenaHashMap Put Mem Stats")
 
 	startGet := time.Now()
 	for i := 0; i < numEntries; i++ {
 		hm.Get(i)
 	}
 	getDuration := time.Since(startGet)
-	fmt.Printf("ArenaHashMapPtr Get Time: %v\n", getDuration)
+	fmt.Printf("ArenaHashMap Get Time: %v\n", getDuration)
 
 	runtime.KeepAlive(hm)
 }
@@ -82,7 +83,6 @@ func TestStandardMap_PutPerformance(t *testing.T) {
 	runtime.KeepAlive(hm)
 }
 
-// 测试 ArenaHashMap 的 GC 效果
 func TestArenaHashMap_GC(t *testing.T) {
 	mem := arena.NewArena()
 	defer mem.Close()
@@ -108,11 +108,10 @@ func TestArenaHashMap_GC(t *testing.T) {
 	runtime.KeepAlive(hm)
 }
 
-// 测试 ArenaHashMap 的 GC 效果
 func TestArenaHashMapPtr_GC(t *testing.T) {
 	mem := arena.NewArena()
 	defer mem.Close()
-	hm := NewArenaHashMapPtr[int, string](mem)
+	hm := NewArenaHashMap[int, string](mem)
 
 	startPut := time.Now()
 	for i := 0; i < numEntries; i++ {
@@ -134,7 +133,6 @@ func TestArenaHashMapPtr_GC(t *testing.T) {
 	runtime.KeepAlive(hm)
 }
 
-// 测试 ArenaHashMap 的 GC 效果
 func TestStandardMap_GC(t *testing.T) {
 	hm := make(map[int]string)
 	startPut := time.Now()

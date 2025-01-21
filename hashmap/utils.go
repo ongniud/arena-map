@@ -5,12 +5,11 @@ import (
 	"hash/fnv"
 	"math"
 	"math/rand"
-	"unsafe"
 )
 
 func hash[K comparable](key K) int {
 	h := fnv.New32a()
-	var buf [8]byte // 预分配最大需要的字节数组
+	var buf [8]byte
 	switch v := any(key).(type) {
 	case string:
 		h.Write([]byte(v))
@@ -60,29 +59,12 @@ func hash[K comparable](key K) int {
 	return int(h.Sum32())
 }
 
-// 定义字符集，包含大写字母、小写字母和数字
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-// RandomString 生成指定长度的随机字符串
 func RandomString(length int) string {
-	result := make([]byte, length) // 创建指定长度的字节切片
-	// 从字符集随机选取字符填充切片
+	result := make([]byte, length)
 	for i := 0; i < length; i++ {
-		result[i] = charset[rand.Intn(len(charset))] // 从字符集随机选择一个字符
+		result[i] = charset[rand.Intn(len(charset))]
 	}
-	return string(result) // 将字节切片转为字符串返回
-}
-
-func tToPtr[T any](data *T) uintptr {
-	if data == nil {
-		return 0
-	}
-	return uintptr(unsafe.Pointer(data))
-}
-
-func ptrToT[T any](ptr uintptr) *T {
-	if ptr == 0 {
-		return nil
-	}
-	return (*T)(unsafe.Pointer(ptr))
+	return string(result)
 }

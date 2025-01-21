@@ -3,7 +3,6 @@ package alloc
 type chunk struct {
 	loc
 	next loc
-	// for gc
 	refs int32
 }
 
@@ -12,7 +11,7 @@ type loc struct {
 	chunkId int
 }
 
-var nilLoc = loc{-1, -1} // A sentinel.
+var nilLoc = loc{-1, -1}
 
 // IsNil returns true if the loc came from NilLoc().
 func (l loc) IsNil() bool {

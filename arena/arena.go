@@ -1,8 +1,9 @@
 package arena
 
 import (
-	"github.com/ongniud/arena-map/alloc"
 	"unsafe"
+
+	"github.com/ongniud/arena-map/alloc"
 )
 
 type Arena interface {

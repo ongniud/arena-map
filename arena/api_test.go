@@ -86,8 +86,6 @@ func TestArenaAllocFailure(t *testing.T) {
 	ptr.X = 1
 	ptr.Y = 2
 	fmt.Println(ptr)
-
-	FreeAny(a, ptr)
 	prt2 := New[SmallStruct](a)
 	prt2.X = 3
 	prt2.Y = 4

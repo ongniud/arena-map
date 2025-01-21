@@ -46,14 +46,8 @@ func newDefaultOptions() *Options {
 }
 
 type Options struct {
-	// Size of a single slab in bytes.
-	// Defaults to 1MB.
-	SlabSize int
-	// Step defines Slab classes growing proportion.
-	// Must be > 1.0.
-	// Defaults to 1.25.
+	SlabSize     int
 	GrowthFactor float64
 	Malloc       Malloc
-
-	Align bool
+	Align        bool
 }

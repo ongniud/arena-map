@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	numOperations = 100 // 总操作数
+	numOperations = 100
 )
 
 func generateTestData(num int) []string {
