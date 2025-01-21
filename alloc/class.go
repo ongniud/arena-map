@@ -13,9 +13,7 @@ type class struct {
 	slabSize  int
 	chunkSize int
 
-	// inner
 	free loc
-	// stats
 	objs int
 }
 
