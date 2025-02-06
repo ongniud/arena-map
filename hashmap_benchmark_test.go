@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/ongniud/arena-map/arena"
+	"github.com/ongniud/arena"
 )
 
 const (

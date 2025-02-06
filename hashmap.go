@@ -1,7 +1,7 @@
 package hashmap
 
 import (
-	"github.com/ongniud/arena-map/arena"
+	"github.com/ongniud/arena"
 )
 
 const InitialBucketSize = 16

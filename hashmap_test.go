@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ongniud/arena-map/arena"
+	"github.com/ongniud/arena"
 )
 
 func TestArenaHashMapBasicOperations(t *testing.T) {
