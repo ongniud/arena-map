@@ -32,7 +32,7 @@ For more details, see http://en.wikipedia.org/wiki/Slab_allocation
 
 
 ## Limitations:
-- Supports Only Base Types: Only basic types (including string) are supported currently. Complex types will be supported soon.
+- Supports Only Base Types: Only basic types (including string) are supported currently.
 - No Memory Alignment Support: Memory alignment is not currently supported due to implementation complexity, however, solutions are being explored and tested.
 - Higher Memory Cost: ArenaMap consumes more memory than Go's standard map.
 - Not Concurrency-Safe: ArenaMap is not thread-safe. Please use your own locking.
