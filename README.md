@@ -1,70 +1,99 @@
-This repo implements an arena-based hashmap designed to significantly reduce the impact of garbage collection (GC).
+# ArenaMap
 
-In certain scenarios, maps are used to store item attributes and process stage features for later operations such as joining, filtering, or conversion. These maps may handle large amounts of data but do not require high concurrency or frequent updates. Once the process is completed, the map can be released.
+`ArenaMap` is a memory-efficient hash map implementation in Go that utilizes an arena allocator to minimize garbage collection overhead. This implementation is particularly useful for high-performance applications where memory allocation and deallocation need to be tightly controlled.
 
-In Go, frequent memory allocations and deallocations can negatively impact performance due to the overhead of managing numerous memory blocks and pointers. An arena-based map is ideal for these situations, as it minimizes memory management overhead.
+## Features
 
-## Guide
+- **Memory Efficiency**: Utilizes an arena allocator (`arena.Arena`) for memory management, reducing the overhead of individual memory allocations and deallocations.
+- **Dynamic Resizing**: Automatically resizes the hash map when the number of stored elements exceeds a certain threshold, ensuring efficient memory usage.
+- **Key-Value Storage**: Stores key-value pairs in buckets using a hash table implementation for quick retrieval and insertion.
 
-### What is memory arena?
-A memory arena is a memory management technique where a large block of memory is allocated at once, and parts of it are used for allocations.
+## Usage
 
-In garbage-collected languages like Go, memory arenas offer:
-- Memory Reuse: By reusing memory within the arena, it reduces the need for frequent allocations, which can lead to performance improvements.
-- Reduced GC Pause: Fewer allocations mean less work for the garbage collector, leading to shorter GC pauses.
-- Improved Memory Locality: Allocating related objects close together enhances cache performance, speeding up memory operations.
+### Initialization
 
-However, memory arenas also have trade-offs, such as potentially higher memory usage due to unused space. Careful consideration and profiling are needed to determine if they are the right solution for your application.
+To create a new `ArenaHashMap`, use the `NewArenaHashMap` function, passing an `arena.Arena` instance as a parameter.
 
-### What is slab allocation?
+```go
+mem := arena.NewArena()
+hm := NewArenaHashMap(mem)
+```
 
-Slab allocation is a simple memory management method where memory is divided into fixed-size chunks called slabs.
+### Insertion
 
-Each arena manages slabs, which are large blocks of memory divided into chunks of the same size. When a new allocation is needed, the first available chunk is used. If no chunks are available, a new slab is allocated.
+To insert a key-value pair into the hash map, use the `Put` method.
 
-For more details, see http://en.wikipedia.org/wiki/Slab_allocation
+```go
+hm.Put("key", "value")
+```
 
+### Retrieval
 
-### Suitable Scenarios:
+To retrieve a value associated with a key from the hash map, use the `Get` method.
 
-- GC-Intensive Workloads:  Perfect for applications where frequent memory allocations result in significant GC overhead, helping to reduce performance impacts.
-- Frequent Memory Allocations: Ideal for operations with high allocation frequency, as ArenaMap reuses pre-allocated memory, reducing allocation overhead.
+```go
+value, found := hm.Get("key")
+if found {
+    fmt.Println("Value:", value)
+} else {
+    fmt.Println("Key not found")
+}
+```
 
+### Deletion
 
-## Limitations:
-- Supports Only Base Types: Only basic types (including string) are supported currently.
-- No Memory Alignment Support: Memory alignment is not currently supported due to implementation complexity, however, solutions are being explored and tested.
-- Higher Memory Cost: ArenaMap consumes more memory than Go's standard map.
-- Not Concurrency-Safe: ArenaMap is not thread-safe. Please use your own locking.
+To delete a key-value pair from the hash map, use the `Delete` method.
+
+```go
+hm.Delete("key")
+```
+
+### Memory Management
+
+To release the memory allocated by the hash map, use the `Free` method.
+
+```go
+hm.Free()
+```
+
 
 ## Example
+```go
+package main
 
-## Requirement
-- go 1.18+
-- go module project
+import (
+    "fmt"
 
-## TODO
-- Support for memory alignment.
-- Support for complex object allocation.
-- Improve hashmap realism and efficiency.
-- Improve documentation.
-- Increase test coverage.
-- Improve error handling.
+    "github.com/ongniud/arena"
+    "github.com/ongniud/arena-map"
+)
 
-## Contributing
-Contributions from the community are welcome! This project accepts contributions via GitHub pull requests:
+func main() {
+    mem := arena.NewArena()
+    defer mem.Close()
 
-- Fork the repository.
-- Create a feature branch (git checkout -b my-feature)
-- Commit your changes (git commit -am 'Add some feature')
-- Push to the branch (git push origin my-feature)
-- Create a pull request.
+    hm := amap.NewArenaHashMap[int, string](mem)
 
-If you encounter any issues, please let us know by opening a GitHub issue. We appreciate detailed and accurate reports that help us identify and reproduce the issue.
+    hm.Put(1, "one")
+    hm.Put(2, "two")
+    hm.Put(3, "three")
 
-## Contact
-If you have any questions, feedback or suggestions, please feel free to contact me. 
-I'm always open to feedback and would love to hear from you!
+    if val, ok := hm.Get(2); ok {
+        fmt.Println("Value for key 2:", val)
+    }
 
-### License
-This project is licensed under the MIT License.
+    hm.Delete(2)
+    if _, ok := hm.Get(2);!ok {
+        fmt.Println("Key 2 has been deleted.")
+    }
+    hm.Free()
+}
+```
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+---
+
+Feel free to contribute, report issues, or suggest improvements by creating a pull request or issue on GitHub.

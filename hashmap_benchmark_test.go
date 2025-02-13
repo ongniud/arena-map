@@ -1,4 +1,4 @@
-package hashmap
+package amap
 
 import (
 	"math/rand"
